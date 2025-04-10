@@ -1,15 +1,14 @@
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, ScrollView } from "react-native";
 import { recognizeText, type OCRResult } from "@hamza/ocr";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 
 export default function Index() {
-  const [ocrResult, setOcrResult] = useState<OCRResult[]>([]);
+  const [lines, setLines] = useState<string[]>([]);
 
   const scan = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      aspect: [4, 3],
       quality: 1,
     });
 
@@ -20,33 +19,63 @@ export default function Index() {
           languageHints: ["ar", "en"],
         });
 
-        resultRecongnazion.forEach((item, index) => {
-          console.log(
-            `[${index + 1}] ${item.text} (${Math.round(
-              item.confidence * 100
-            )}%)`
-          );
-        });
+        const groupedLines = groupByLine(resultRecongnazion);
+        const fullLines = groupedLines.map((line) =>
+          line.map((item) => item.text).join(" ")
+        );
 
-        setOcrResult(resultRecongnazion);
-        console.log("📄 OCR Result:", resultRecongnazion);
+        console.log("📄 Grouped lines:", fullLines);
+        setLines(fullLines);
       } catch (e) {
         console.log("❌ OCR Error:", e);
       }
     }
   };
 
+  function groupByLine(results: OCRResult[], threshold = 0.015) {
+    const lines: Record<string, OCRResult[]> = {};
+
+    results.forEach((item) => {
+      const y = item.boundingBox.y;
+      const key = Object.keys(lines).find(
+        (lineY) => Math.abs(Number(lineY) - y) < threshold
+      );
+
+      if (key) {
+        lines[key].push(item);
+      } else {
+        lines[y] = [item];
+      }
+    });
+
+    return Object.values(lines)
+      .map((line) => line.sort((a, b) => a.boundingBox.x - b.boundingBox.x))
+      .sort((a, b) => a[0].boundingBox.y - b[0].boundingBox.y);
+  }
+
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Pressable onPress={scan}>
-        <Text style={{ fontSize: 18 }}>📸 Pick Image and Scan Text</Text>
+    <View style={{ flex: 1, paddingTop: 60, paddingHorizontal: 20 }}>
+      <Pressable
+        onPress={scan}
+        style={{
+          backgroundColor: "#111",
+          padding: 12,
+          borderRadius: 12,
+          marginBottom: 20,
+        }}
+      >
+        <Text style={{ color: "#fff", textAlign: "center", fontSize: 16 }}>
+          📸 Pick Image and Scan Text
+        </Text>
       </Pressable>
 
-      {ocrResult.map((line, idx) => (
-        <Text key={idx}>
-          {idx + 1}. {line.text} ({Math.round(line.confidence * 100)}%)
-        </Text>
-      ))}
+      <ScrollView>
+        {lines.map((line, idx) => (
+          <Text key={idx} style={{ fontSize: 16, marginVertical: 4 }}>
+            {idx + 1}. {line}
+          </Text>
+        ))}
+      </ScrollView>
     </View>
   );
 }
