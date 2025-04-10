@@ -1,0 +1,43 @@
+{
+  "name": "@hamza/ocr",
+  "version": "0.1.0",
+  "description": "ocr module",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "expo-module build",
+    "clean": "expo-module clean",
+    "lint": "expo-module lint",
+    "test": "expo-module test",
+    "prepare": "expo-module prepare",
+    "prepublishOnly": "expo-module prepublishOnly",
+    "expo-module": "expo-module",
+    "open:ios": "xed example/ios",
+    "open:android": "open -a \"Android Studio\" example/android"
+  },
+  "keywords": [
+    "react-native",
+    "expo",
+    "@hamza/ocr",
+    "OcrModule"
+  ],
+  "repository": "https://github.com/hamzamekk/hamza-ocr",
+  "bugs": {
+    "url": "https://github.com/hamzamekk/hamza-ocr/issues"
+  },
+  "author": "hamzamekk <hamza.mekkoudi@gmail.com> (https://github.com/hamzamekk)",
+  "license": "MIT",
+  "homepage": "https://github.com/hamzamekk/hamza-ocr#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "~18.3.12",
+    "expo-module-scripts": "^4.0.4",
+    "expo": "~52.0.0",
+    "react-native": "0.76.0"
+  },
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  }
+}

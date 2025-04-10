@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@hamza/ocr": ["../src/index"],
+      "@hamza/ocr/*": ["../src/*"]
+    }
+  }
+}
